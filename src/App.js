@@ -3,9 +3,10 @@ import {BrowserRouter, Switch, Route, Link, Redirect} from 'react-router-dom';
 import {connect} from 'react-redux';
 
 import * as ChatActions from './store/actions/chatActions';
-import * as AuthActions from './store/actions/authActions';
 import Auth from './components/pages/Auth';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+import Messenger from './components/pages/Messenger';
 
 class App extends React.Component {
 
@@ -16,11 +17,6 @@ class App extends React.Component {
   render() {
     return (
       <div className="App">
-
-        <button onClick={e => {
-          this.props.logout()
-        }}>Log out</button>
-
         <BrowserRouter>
           <Switch>
 
@@ -54,6 +50,24 @@ class App extends React.Component {
               }}
             />
 
+
+
+            <Route
+              path="/:threadId"
+              render={props => {
+                if (!this.props.token) {
+                  return (
+                    <Redirect to="/login" />
+                  );
+                } else {
+                  return (
+                    <Messenger />
+                  );
+                }
+              }}
+            />
+
+
             <Route
               path="/"
               render={props => {
@@ -63,7 +77,7 @@ class App extends React.Component {
                   );
                 } else {
                   return (
-                    <h1>Root</h1>
+                    <Messenger />
                   );
                 }
               }}
@@ -84,9 +98,6 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   setupSocket: () => {
     dispatch(ChatActions.setupSocket())
-  },
-  logout: () => {
-    dispatch(AuthActions.logout())
   }
 })
 

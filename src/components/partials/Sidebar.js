@@ -15,7 +15,7 @@ class Sidebar extends Component {
     this.props.chat.socket.send(JSON.stringify({
       type: 'SEARCH',
       data: this.state.search
-    }))
+    }));
   }
 
   findOrCreateThread = (id) => {
@@ -28,7 +28,7 @@ class Sidebar extends Component {
           id
         ]
       }
-    ))
+    ));
   }
 
   render() {
@@ -63,41 +63,57 @@ class Sidebar extends Component {
           </div>
 
           {this.state.search && this.props.chat.users.length ?
+
             <ul className="thread-list">
+
               <label>Results</label>
-              {this.props.chat.users.length ? this.props.chat.users.filter(u => u.id !== this.props.auth.user.id).filter(a => a.email.includes(this.state.search)).map((userRef, index) => {
-                return (
-                  <li key={index}>
-                    <a onClick={e => {
-                      e.preventDefault()
-                      this.findOrCreateThread(userRef.id)
-                    }}>
-                      <i className="zmdi zmdi-account-circle" />
-                      <div>
-                        <h5>{userRef.name}</h5>
-                        <p>{userRef.email}</p>
-                      </div>
-                    </a>
-                  </li>
-                );
-              }) : null}
+
+              {this.props.chat.users.length ? 
+                this.props.chat.users
+                  .filter(u => u.id !== this.props.auth.user.id)
+                  .filter(a => a.email.includes(this.state.search))
+                  .map((userRef, index) => {
+                    return (
+                      <li key={index}>
+                        <a onClick={e => {
+                          e.preventDefault()
+                          this.findOrCreateThread(userRef.id)
+                        }}>
+                          <i className="zmdi zmdi-account-circle" />
+                          <div>
+                            <h5>{userRef.name}</h5>
+                            <p>{userRef.email}</p>
+                          </div>
+                        </a>
+                      </li>
+                    );
+                  }) 
+                : null
+              }
             </ul>
             :
             <ul className="thread-list">
+
               <label>Messages</label>
-              {this.props.chat.threads.length ? this.props.chat.threads.map((threadRef, index) => {
-                return (
-                  <li key={index}>
-                    <Link to={`/${threadRef.id}`}>
-                      <i className="zmdi zmdi-account-circle" />
-                      <div>
-                        <h5>{threadRef.id}</h5>
-                        <p>Some other thread</p>
-                      </div>
-                    </Link>
-                  </li>
-                );
-              }) : null}
+
+              {this.props.chat.threads.length ? 
+                this.props.chat.threads
+                  .filter(t => t.users.indexOf(this.props.auth.user.id) > -1)
+                  .map((threadRef, index) => {
+                    return (
+                      <li key={index}>
+                        <Link to={`/${threadRef.id}`}>
+                          <i className="zmdi zmdi-account-circle" />
+                          <div>
+                            <h5>{threadRef.id}</h5>
+                            <p>Some other thread</p>
+                          </div>
+                        </Link>
+                      </li>
+                    );
+                  })
+                : null
+              }
             </ul>
 
           }
@@ -111,7 +127,7 @@ class Sidebar extends Component {
 const mapStateToProps = state => ({
   auth: state.auth,
   chat: state.chat
-})
+});
 
 const mapDispatchToProps = dispatch => ({
 
@@ -119,9 +135,10 @@ const mapDispatchToProps = dispatch => ({
     dispatch(AuthActions.logout())
   }
 
-})
+});
+
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(Sidebar)
+)(Sidebar);

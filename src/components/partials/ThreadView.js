@@ -1,21 +1,23 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux'
-
 import {withRouter, Link} from 'react-router-dom';
+import Message from './Message';
 
 
 class ThreadView extends Component {
 
-  constructor(props) {
-    super(props)
-    console.log({props})
-  }
-
-  componentDidMount () {
+  componentDidMount(props) {
     this.init();
+
   }
 
   componentDidUpdate(props) {
+
+    if (props.match.params.threadId !== this.props.match.params.threadId) {
+      const mainView = document.querySelector('.main-view')
+      mainView.scrollTop = mainView.scrollHeight
+    }
+
     try {
       if (props.match.params.threadId !== this.props.match.params.threadId) {
         this.init();
@@ -33,10 +35,11 @@ class ThreadView extends Component {
       console.log({e})
     }
 
-    //console.log('current chat', this.props.chat)
-    //console.log('current props', this.props)
-    //console.log('current thread', currentThread)
-    if (currentThread && this.props.chat.socket.readyState && this.props.chat.socket.send) {
+    if (
+      currentThread && 
+      this.props.chat.socket.readyState && 
+      this.props.chat.socket.send
+    ) {
       let skip = currentThread.messages || 0
       this.props.chat.socket.send(JSON.stringify({
         type: 'THREAD_LOAD',
@@ -52,7 +55,22 @@ class ThreadView extends Component {
   render() {
     return (
       <div className="main-view">
-        hello
+      {this.props.chat.threads.filter(thread => thread.id === this.props.match.params.threadId).map((thread, i) => {
+        return (
+          <div className="message-container" key={i}>
+            {thread.Messages.map((msg, mi) => {
+              return (
+                <Message 
+                  msg={msg} 
+                  key={mi} 
+                  profile={thread.profiles.filter(p => p.id === msg.userId)[0]}
+                />
+              );
+            })}
+            
+          </div>
+        );
+      })}
       </div>
     );
   }
@@ -61,13 +79,14 @@ class ThreadView extends Component {
 const mapStateToProps = state => ({
   auth: state.auth,
   chat: state.chat
-})
+});
 
 const mapDispatchToProps = dispatch => ({
 
-})
+});
+
 
 export default withRouter(connect(
   mapStateToProps,
   mapDispatchToProps
-)(ThreadView))
+)(ThreadView));

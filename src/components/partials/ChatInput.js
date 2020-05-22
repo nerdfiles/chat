@@ -12,17 +12,40 @@ class ChatInput extends Component {
       content: ''
     }
   }
+  sendMessage = (e) => {
+    e.preventDefault();
+    const msg = {
+      threadId: this.props.match.params.threadId,
+      userId: this.props.auth.user.id,
+      content: this.state.content,
+      date: new Date()
+    }
+
+    this.props.chat.socket.send(JSON.stringify({
+      type: 'ADD_MESSAGE',
+      threadId: msg.threadId,
+      message: msg
+    }))
+
+    this.setState({content: ''})
+  }
   render() {
     return (
-      <div className="input-view">
-        <input 
-          value={this.state.content}
-          onChange={e => this.setState({content: e.target.value})}
-          type="text" 
-          placeholder="Write some" 
-          className="form-control" 
-        />
-      </div>
+      <form 
+        className="input-view"
+        onSubmit={e => this.sendMessage(e)}
+      >
+        <div className="input-group">
+          <input 
+            value={this.state.content}
+            onChange={e => this.setState({content: e.target.value})}
+            type="text" 
+            placeholder="Write some" 
+            className="form-control" 
+          />
+          <button className="btn btn-send input-group-append"><i className="zmdi zmdi-mail-send" /></button>
+        </div>
+      </form>
     );
   }
 }
@@ -36,7 +59,7 @@ const mapDispatchToProps = dispatch => ({
 
 })
 
-export default connect(
+export default withRouter(connect(
   mapStateToProps,
   mapDispatchToProps
-)(ChatInput)
+)(ChatInput));

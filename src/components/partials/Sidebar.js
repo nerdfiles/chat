@@ -18,6 +18,19 @@ class Sidebar extends Component {
     }))
   }
 
+  findOrCreateThread = (id) => {
+    console.log(this.props)
+    this.props.chat.socket.send(JSON.stringify(
+      {
+        type: 'FIND_THREAD',
+        data: [
+          this.props.auth.user.id,
+          id
+        ]
+      }
+    ))
+  }
+
   render() {
     return (
       <>
@@ -49,24 +62,43 @@ class Sidebar extends Component {
 
           </div>
 
-          {this.props.chat.users.length ?
+          {this.state.search && this.props.chat.users.length ?
             <ul className="thread-list">
               <label>Results</label>
-              {this.props.chat.users.length && this.props.chat.users.filter(a => a.email.includes(this.state.search)).map((userRef, index) => {
+              {this.props.chat.users.length ? this.props.chat.users.filter(u => u.id !== this.props.auth.user.id).filter(a => a.email.includes(this.state.search)).map((userRef, index) => {
                 return (
                   <li key={index}>
-                    <Link to="/thread">
+                    <a onClick={e => {
+                      e.preventDefault()
+                      this.findOrCreateThread(userRef.id)
+                    }}>
                       <i className="zmdi zmdi-account-circle" />
                       <div>
                         <h5>{userRef.name}</h5>
                         <p>{userRef.email}</p>
                       </div>
+                    </a>
+                  </li>
+                );
+              }) : null}
+            </ul>
+            :
+            <ul className="thread-list">
+              <label>Messages</label>
+              {this.props.chat.threads.length ? this.props.chat.threads.map((threadRef, index) => {
+                return (
+                  <li key={index}>
+                    <Link to={`/${threadRef.id}`}>
+                      <i className="zmdi zmdi-account-circle" />
+                      <div>
+                        <h5>{threadRef.id}</h5>
+                        <p>Some other thread</p>
+                      </div>
                     </Link>
                   </li>
                 );
-              })}
+              }) : null}
             </ul>
-            : null
 
           }
 

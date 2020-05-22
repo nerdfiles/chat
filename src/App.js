@@ -11,7 +11,7 @@ import Messenger from './components/pages/Messenger';
 class App extends React.Component {
 
   componentDidMount() {
-    this.props.setupSocket()
+    this.props.setupSocket(this.props.auth.token, this.props.auth.user.id)
   }
 
   render() {
@@ -23,7 +23,7 @@ class App extends React.Component {
             <Route
               path="/login"
               render={props => {
-                if (this.props.token) {
+                if (this.props.auth.token) {
                   return (
                     <Redirect to="/" />
                   );
@@ -38,7 +38,7 @@ class App extends React.Component {
             <Route
               path="/signup"
               render={props => {
-                if (this.props.token) {
+                if (this.props.auth.token) {
                   return (
                     <Redirect to="/" />
                   );
@@ -55,7 +55,7 @@ class App extends React.Component {
             <Route
               path="/:threadId"
               render={props => {
-                if (!this.props.token) {
+                if (!this.props.auth.token) {
                   return (
                     <Redirect to="/login" />
                   );
@@ -71,7 +71,7 @@ class App extends React.Component {
             <Route
               path="/"
               render={props => {
-                if (!this.props.token) {
+                if (!this.props.auth.token) {
                   return (
                     <Redirect to="/login" />
                   );
@@ -91,13 +91,13 @@ class App extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  ...state.auth,
-  ...state.chat
+  auth: state.auth,
+  chat: state.chat
 })
 
 const mapDispatchToProps = dispatch => ({
-  setupSocket: () => {
-    dispatch(ChatActions.setupSocket())
+  setupSocket: (token, userId) => {
+    dispatch(ChatActions.setupSocket(token, userId))
   }
 })
 

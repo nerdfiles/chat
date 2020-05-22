@@ -3,7 +3,8 @@ const defaultState = {
   message: '',
   threads: [],
   currentThread: '',
-  users: []
+  users: [],
+  readyState: false
 
 }
 
@@ -18,7 +19,19 @@ const chat = (state = defaultState, action ) => {
       return {
         ...state,
         users: action.payload
-      }
+      };
+    case 'ADD_THREAD':
+      return {
+        ...state,
+        threads: state.threads.filter(t => t.id === action.payload.id).length === 0 ? 
+          state.threads.concat(action.payload) : 
+          state.threads
+      };
+    case 'INITIAL_THREADS':
+      return {
+        ...state,
+        threads: action.payload
+      };
     default:
       return state;
   }
